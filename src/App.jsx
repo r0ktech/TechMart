@@ -54,6 +54,48 @@ const categories = [
   ],
 ];
 const fallback = categories[0][2];
+const productImages = {
+  laptops: categories[0][2],
+  smartphones: categories[1][2],
+  tablets: categories[2][2],
+  monitors: categories[3][2],
+  accessories:
+    "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?auto=format&fit=crop&w=700&q=80",
+  gaming: categories[5][2],
+  keyboards:
+    "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=700&q=80",
+  mice: "https://images.unsplash.com/photo-1527814050087-3793815479db?auto=format&fit=crop&w=700&q=80",
+  headphones:
+    "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?auto=format&fit=crop&w=700&q=80",
+  storage:
+    "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?auto=format&fit=crop&w=700&q=80",
+  ram: "https://images.unsplash.com/photo-1562976540-1502c2145186?auto=format&fit=crop&w=700&q=80",
+  "graphics-cards":
+    "https://images.unsplash.com/photo-1591488320449-011701bb6704?auto=format&fit=crop&w=700&q=80",
+  chargers:
+    "https://images.unsplash.com/photo-1609592424455-0f7c4c0d8c91?auto=format&fit=crop&w=700&q=80",
+};
+
+const getProductImage = (product) =>
+  product.images?.[0]?.startsWith("http")
+    ? product.images[0]
+    : productImages[product.category] || fallback;
+
+const pickDiverseProducts = (source, limit) => {
+  const picked = [];
+  const seenCategories = new Set();
+  for (const product of source) {
+    if (!seenCategories.has(product.category)) {
+      picked.push(product);
+      seenCategories.add(product.category);
+    }
+    if (picked.length === limit) return picked;
+  }
+  return [
+    ...picked,
+    ...source.filter((product) => !picked.includes(product)),
+  ].slice(0, limit);
+};
 
 function ProductCard({ product, onAdd }) {
   const { toggleItem, isInWishlist } = useWishlist();
@@ -71,15 +113,7 @@ function ProductCard({ product, onAdd }) {
         >
           <Heart size={17} fill={saved ? "currentColor" : "none"} />
         </button>
-        <img
-          src={
-            product.images?.[0]?.startsWith("http")
-              ? product.images[0]
-              : fallback
-          }
-          alt={product.name}
-          loading="lazy"
-        />
+        <img src={getProductImage(product)} alt={product.name} loading="lazy" />
       </div>
       <div className="product-body">
         <p className="brand-line">
@@ -127,10 +161,14 @@ function App() {
       }),
     [category, query],
   );
-  const trending = visible.filter((product) => product.trending).slice(0, 8);
-  const deals = products
-    .filter((product) => product.deal || product.discount >= 10)
-    .slice(0, 4);
+  const trending = pickDiverseProducts(
+    visible.filter((product) => product.trending),
+    8,
+  );
+  const deals = pickDiverseProducts(
+    products.filter((product) => product.deal || product.discount >= 10),
+    4,
+  );
   const add = (product) => {
     addItem(product);
     setToast(`${product.name} added to cart`);
@@ -274,9 +312,9 @@ function App() {
             <div className="hero-image">
               <div className="label">
                 <small>New arrival</small>
-                <b>MacBook Air M2</b>
+                <b>Pixel 9 Pro</b>
               </div>
-              <img src={fallback} alt="Premium laptop setup" />
+              <img src={productImages.smartphones} alt="Premium smartphone" />
             </div>
           </section>
           <section className="container categories">
