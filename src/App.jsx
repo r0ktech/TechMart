@@ -129,7 +129,11 @@ function ProductCard({ product, onAdd }) {
             <Check size={11} /> Verified
           </span>
         </p>
-        <h3>{product.name}</h3>
+        <h3>
+          <a className="product-title" href={`/product/${product.id}`}>
+            {product.name}
+          </a>
+        </h3>
         <p className="spec">{product.shortDescription}</p>
         <div className="rating">
           <Star size={13} fill="currentColor" /> <b>{product.rating}</b>{" "}
@@ -262,7 +266,12 @@ function CartDrawer({ isOpen, onClose }) {
                 <span>Total</span>
                 <strong>{formatPrice(total)}</strong>
               </div>
-              <button className="primary checkout-button">
+              <button
+                className="primary checkout-button"
+                onClick={() => {
+                  window.location.href = "/checkout";
+                }}
+              >
                 Proceed to checkout <ArrowRight size={16} />
               </button>
               <p className="cart-note">
@@ -330,21 +339,277 @@ function HomePage() {
 
   return (
     <div className="app-shell">
-        <div className="announcement">
-          <Zap size={13} /> Free delivery on orders over ₦500,000{" "}
-          <span>
-            Shop the tech you love <ArrowRight size={13} />
-          </span>
-        </div>
-        <header>
-          <div className="topbar container">
-            <button
-              className="menu"
-              onClick={() => setMenu(!menu)}
-              aria-label="Toggle menu"
-            >
-              {menu ? <X /> : <Menu />}
+      <div className="announcement">
+        <Zap size={13} /> Free delivery on orders over ₦500,000{" "}
+        <span>
+          Shop the tech you love <ArrowRight size={13} />
+        </span>
+      </div>
+      <header>
+        <div className="topbar container">
+          <button
+            className="menu"
+            onClick={() => setMenu(!menu)}
+            aria-label="Toggle menu"
+          >
+            {menu ? <X /> : <Menu />}
+          </button>
+          <Link className="logo" to="/">
+            <span className="logo-mark" aria-hidden="true">
+              <i>T</i>
+              <i>M</i>
+            </span>
+            tech<b>mart</b>
+          </Link>
+          <form className="search" onSubmit={(event) => event.preventDefault()}>
+            <Search size={18} />
+            <input
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="Search laptops, phones, accessories..."
+              aria-label="Search products"
+            />
+            {query && (
+              <button
+                type="button"
+                onClick={() => setQuery("")}
+                aria-label="Clear search"
+              >
+                <X size={15} />
+              </button>
+            )}
+            <button className="search-submit">Search</button>
+          </form>
+          <div className="header-actions">
+            <div className="delivery">
+              <MapPin size={17} /> Deliver to <b>Nigeria</b>
+            </div>
+            <a className="account" href="/account">
+              Hi, <b>Sign in</b>
+            </a>
+            <button className="header-icon" aria-label="Wishlist">
+              <Heart size={20} />
+              <i>{wishlistCount}</i>
             </button>
+            <button
+              className="header-icon"
+              onClick={() => setCartOpen(true)}
+              aria-label="Open cart"
+            >
+              <ShoppingCart size={20} />
+              <i>{cartCount}</i>
+            </button>
+          </div>
+        </div>
+        <nav className={menu ? "nav open" : "nav"}>
+          <div className="container nav-inner">
+            <button
+              className={category === "all" ? "active" : ""}
+              onClick={() => selectCategory("all")}
+            >
+              All Products
+            </button>
+            {categories.map(([id, name]) => (
+              <button
+                key={id}
+                className={category === id ? "active" : ""}
+                onClick={() => selectCategory(id)}
+              >
+                {name}
+              </button>
+            ))}
+            <button
+              className="deal-link"
+              onClick={() =>
+                document
+                  .getElementById("deals")
+                  ?.scrollIntoView({ behavior: "smooth" })
+              }
+            >
+              <Zap size={14} /> Deals
+            </button>
+          </div>
+        </nav>
+      </header>
+      <main>
+        <section className="hero container">
+          <div>
+            <p className="kicker">
+              <Sparkles size={14} /> Curated tech. Better living.
+            </p>
+            <h1>
+              Power up your
+              <br />
+              <em>everyday.</em>
+            </h1>
+            <p className="hero-copy">
+              Premium laptops, smartphones and accessories chosen for the way
+              you work, play and connect.
+            </p>
+            <div className="hero-actions">
+              <button
+                className="primary"
+                onClick={() => selectCategory("laptops")}
+              >
+                Shop laptops <ArrowRight size={16} />
+              </button>
+              <button
+                className="text-button"
+                onClick={() =>
+                  document
+                    .getElementById("deals")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+              >
+                Explore deals <ArrowRight size={16} />
+              </button>
+            </div>
+            <p className="proof">
+              Trusted by <b>10,000+ tech shoppers</b> across Nigeria
+            </p>
+          </div>
+          <div className="hero-image">
+            <div className="label">
+              <small>New arrival</small>
+              <b>Pixel 9 Pro</b>
+            </div>
+            <img src={productImages.smartphones} alt="Premium smartphone" />
+          </div>
+        </section>
+        <section className="container categories">
+          <div className="section-head">
+            <div>
+              <p className="kicker">Find your fit</p>
+              <h2>Shop by category</h2>
+            </div>
+            <button className="text-button">
+              View all <ArrowRight size={15} />
+            </button>
+          </div>
+          <div className="category-grid">
+            {categories.map(([id, name, image]) => (
+              <button
+                className="category-card"
+                key={id}
+                onClick={() => selectCategory(id)}
+              >
+                <img src={image} alt="" />
+                <b>{name}</b>
+              </button>
+            ))}
+          </div>
+        </section>
+        <HomeHighlights />
+        <section className="deals" id="deals">
+          <div className="container">
+            <div className="section-head light">
+              <div>
+                <p className="kicker">Limited-time offers</p>
+                <h2>
+                  Flash deals <span className="dot" />
+                </h2>
+              </div>
+              <strong className="timer">Ends in 04 : 32 : 18</strong>
+            </div>
+            <div className="product-grid">
+              {deals.map((product) => (
+                <ProductCard key={product.id} product={product} onAdd={add} />
+              ))}
+            </div>
+          </div>
+        </section>
+        <section className="container discover" id="discover">
+          <div className="section-head">
+            <div>
+              <p className="kicker">Handpicked for you</p>
+              <h2>
+                {query
+                  ? `Results for “${query}”`
+                  : category === "all"
+                    ? "Trending right now"
+                    : `Best ${category}`}
+              </h2>
+            </div>
+            <button className="text-button">
+              See all <ArrowRight size={15} />
+            </button>
+          </div>
+          {trending.length ? (
+            <div className="product-grid">
+              {trending.map((product) => (
+                <ProductCard key={product.id} product={product} onAdd={add} />
+              ))}
+            </div>
+          ) : (
+            <div className="empty">
+              <Search />
+              <h3>No products found</h3>
+              <p>Try another search or category.</p>
+              <button
+                className="primary"
+                onClick={() => {
+                  setQuery("");
+                  setCategory("all");
+                }}
+              >
+                Clear filters
+              </button>
+            </div>
+          )}
+        </section>
+        <section className="trust">
+          <div className="container trust-grid">
+            <div>
+              <Truck />
+              <b>Fast delivery</b>
+              <span>Across Nigeria</span>
+            </div>
+            <div>
+              <ShieldCheck />
+              <b>Secure payments</b>
+              <span>Protected checkout</span>
+            </div>
+            <div>
+              <Check />
+              <b>Verified products</b>
+              <span>Quality checked</span>
+            </div>
+            <div>
+              <Sparkles />
+              <b>Human support</b>
+              <span>Real help, always</span>
+            </div>
+          </div>
+        </section>
+        <section className="newsletter container">
+          <div>
+            <p className="kicker">The good stuff, occasionally</p>
+            <h2>
+              Get the best tech
+              <br />
+              <em>deals first.</em>
+            </h2>
+          </div>
+          <form onSubmit={(event) => event.preventDefault()}>
+            <label htmlFor="email">Your email address</label>
+            <div>
+              <input
+                id="email"
+                type="email"
+                placeholder="you@example.com"
+                required
+              />
+              <button className="primary">
+                Subscribe <ArrowRight size={15} />
+              </button>
+            </div>
+            <small>Product drops, buying guides and offers. No noise.</small>
+          </form>
+        </section>
+      </main>
+      <footer className="site-footer">
+        <div className="container footer-top">
+          <div className="footer-brand">
             <Link className="logo" to="/">
               <span className="logo-mark" aria-hidden="true">
                 <i>T</i>
@@ -352,345 +617,87 @@ function HomePage() {
               </span>
               tech<b>mart</b>
             </Link>
-            <form
-              className="search"
-              onSubmit={(event) => event.preventDefault()}
-            >
-              <Search size={18} />
-              <input
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search laptops, phones, accessories..."
-                aria-label="Search products"
-              />
-              {query && (
-                <button
-                  type="button"
-                  onClick={() => setQuery("")}
-                  aria-label="Clear search"
-                >
-                  <X size={15} />
-                </button>
-              )}
-              <button className="search-submit">Search</button>
-            </form>
-            <div className="header-actions">
-              <div className="delivery">
-                <MapPin size={17} /> Deliver to <b>Nigeria</b>
-              </div>
-              <a className="account" href="/account">
-                Hi, <b>Sign in</b>
+            <p>
+              Thoughtful technology for the
+              <br />
+              way Nigeria moves.
+            </p>
+            <div className="socials">
+              <a href="#mail" aria-label="Email">
+                <Mail size={16} />
               </a>
-              <button className="header-icon" aria-label="Wishlist">
-                <Heart size={20} />
-                <i>{wishlistCount}</i>
-              </button>
-              <button
-                className="header-icon"
-                onClick={() => setCartOpen(true)}
-                aria-label="Open cart"
-              >
-                <ShoppingCart size={20} />
-                <i>{cartCount}</i>
-              </button>
-            </div>
-          </div>
-          <nav className={menu ? "nav open" : "nav"}>
-            <div className="container nav-inner">
-              <button
-                className={category === "all" ? "active" : ""}
-                onClick={() => selectCategory("all")}
-              >
-                All Products
-              </button>
-              {categories.map(([id, name]) => (
-                <button
-                  key={id}
-                  className={category === id ? "active" : ""}
-                  onClick={() => selectCategory(id)}
-                >
-                  {name}
-                </button>
-              ))}
-              <button
-                className="deal-link"
-                onClick={() =>
-                  document
-                    .getElementById("deals")
-                    ?.scrollIntoView({ behavior: "smooth" })
-                }
-              >
-                <Zap size={14} /> Deals
-              </button>
-            </div>
-          </nav>
-        </header>
-        <main>
-          <section className="hero container">
-            <div>
-              <p className="kicker">
-                <Sparkles size={14} /> Curated tech. Better living.
-              </p>
-              <h1>
-                Power up your
-                <br />
-                <em>everyday.</em>
-              </h1>
-              <p className="hero-copy">
-                Premium laptops, smartphones and accessories chosen for the way
-                you work, play and connect.
-              </p>
-              <div className="hero-actions">
-                <button
-                  className="primary"
-                  onClick={() => selectCategory("laptops")}
-                >
-                  Shop laptops <ArrowRight size={16} />
-                </button>
-                <button
-                  className="text-button"
-                  onClick={() =>
-                    document
-                      .getElementById("deals")
-                      ?.scrollIntoView({ behavior: "smooth" })
-                  }
-                >
-                  Explore deals <ArrowRight size={16} />
-                </button>
-              </div>
-              <p className="proof">
-                Trusted by <b>10,000+ tech shoppers</b> across Nigeria
-              </p>
-            </div>
-            <div className="hero-image">
-              <div className="label">
-                <small>New arrival</small>
-                <b>Pixel 9 Pro</b>
-              </div>
-              <img src={productImages.smartphones} alt="Premium smartphone" />
-            </div>
-          </section>
-          <section className="container categories">
-            <div className="section-head">
-              <div>
-                <p className="kicker">Find your fit</p>
-                <h2>Shop by category</h2>
-              </div>
-              <button className="text-button">
-                View all <ArrowRight size={15} />
-              </button>
-            </div>
-            <div className="category-grid">
-              {categories.map(([id, name, image]) => (
-                <button
-                  className="category-card"
-                  key={id}
-                  onClick={() => selectCategory(id)}
-                >
-                  <img src={image} alt="" />
-                  <b>{name}</b>
-                </button>
-              ))}
-            </div>
-          </section>
-          <HomeHighlights />
-          <section className="deals" id="deals">
-            <div className="container">
-              <div className="section-head light">
-                <div>
-                  <p className="kicker">Limited-time offers</p>
-                  <h2>
-                    Flash deals <span className="dot" />
-                  </h2>
-                </div>
-                <strong className="timer">Ends in 04 : 32 : 18</strong>
-              </div>
-              <div className="product-grid">
-                {deals.map((product) => (
-                  <ProductCard key={product.id} product={product} onAdd={add} />
-                ))}
-              </div>
-            </div>
-          </section>
-          <section className="container discover" id="discover">
-            <div className="section-head">
-              <div>
-                <p className="kicker">Handpicked for you</p>
-                <h2>
-                  {query
-                    ? `Results for “${query}”`
-                    : category === "all"
-                      ? "Trending right now"
-                      : `Best ${category}`}
-                </h2>
-              </div>
-              <button className="text-button">
-                See all <ArrowRight size={15} />
-              </button>
-            </div>
-            {trending.length ? (
-              <div className="product-grid">
-                {trending.map((product) => (
-                  <ProductCard key={product.id} product={product} onAdd={add} />
-                ))}
-              </div>
-            ) : (
-              <div className="empty">
-                <Search />
-                <h3>No products found</h3>
-                <p>Try another search or category.</p>
-                <button
-                  className="primary"
-                  onClick={() => {
-                    setQuery("");
-                    setCategory("all");
-                  }}
-                >
-                  Clear filters
-                </button>
-              </div>
-            )}
-          </section>
-          <section className="trust">
-            <div className="container trust-grid">
-              <div>
-                <Truck />
-                <b>Fast delivery</b>
-                <span>Across Nigeria</span>
-              </div>
-              <div>
-                <ShieldCheck />
-                <b>Secure payments</b>
-                <span>Protected checkout</span>
-              </div>
-              <div>
-                <Check />
-                <b>Verified products</b>
-                <span>Quality checked</span>
-              </div>
-              <div>
-                <Sparkles />
-                <b>Human support</b>
-                <span>Real help, always</span>
-              </div>
-            </div>
-          </section>
-          <section className="newsletter container">
-            <div>
-              <p className="kicker">The good stuff, occasionally</p>
-              <h2>
-                Get the best tech
-                <br />
-                <em>deals first.</em>
-              </h2>
-            </div>
-            <form onSubmit={(event) => event.preventDefault()}>
-              <label htmlFor="email">Your email address</label>
-              <div>
-                <input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  required
-                />
-                <button className="primary">
-                  Subscribe <ArrowRight size={15} />
-                </button>
-              </div>
-              <small>Product drops, buying guides and offers. No noise.</small>
-            </form>
-          </section>
-        </main>
-        <footer className="site-footer">
-          <div className="container footer-top">
-            <div className="footer-brand">
-              <Link className="logo" to="/">
-                <span className="logo-mark" aria-hidden="true">
-                  <i>T</i>
-                  <i>M</i>
-                </span>
-                tech<b>mart</b>
-              </Link>
-              <p>
-                Thoughtful technology for the
-                <br />
-                way Nigeria moves.
-              </p>
-              <div className="socials">
-                <a href="#mail" aria-label="Email">
-                  <Mail size={16} />
-                </a>
-                <a href="#community" aria-label="Community">
-                  <Heart size={16} />
-                </a>
-                <a href="#deals" aria-label="Deals">
-                  <Zap size={16} />
-                </a>
-              </div>
-            </div>
-            <div className="footer-column">
-              <h3>Shop</h3>
-              <a href="#discover">Laptops</a>
-              <a href="#discover">Phones</a>
-              <a href="#discover">Tablets</a>
-              <a href="#deals">Deals</a>
-            </div>
-            <div className="footer-column">
-              <h3>Need help?</h3>
-              <a href="#support">Delivery & returns</a>
-              <a href="#support">Track an order</a>
-              <a href="#support">Contact support</a>
-              <a href="#support">Sell on TechMart</a>
-            </div>
-            <div className="footer-callout">
-              <p className="kicker">Keep in the loop</p>
-              <h3>
-                Good tech,
-                <br />
-                <em>no noise.</em>
-              </h3>
-              <p>New drops and genuinely useful deals, once in a while.</p>
-              <a href="#email">
-                Join the list <ArrowUpRight size={15} />
+              <a href="#community" aria-label="Community">
+                <Heart size={16} />
+              </a>
+              <a href="#deals" aria-label="Deals">
+                <Zap size={16} />
               </a>
             </div>
           </div>
-          <div className="container footer-bottom">
-            <span>© 2026 TechMart Nigeria</span>
-            <span>Made for the curious.</span>
-            <span>Privacy & terms</span>
+          <div className="footer-column">
+            <h3>Shop</h3>
+            <a href="#discover">Laptops</a>
+            <a href="#discover">Phones</a>
+            <a href="#discover">Tablets</a>
+            <a href="#deals">Deals</a>
           </div>
-        </footer>
-        {toast && (
-          <div className="toast">
-            <Check size={16} /> {toast}
+          <div className="footer-column">
+            <h3>Need help?</h3>
+            <a href="#support">Delivery & returns</a>
+            <a href="#support">Track an order</a>
+            <a href="#support">Contact support</a>
+            <a href="#support">Sell on TechMart</a>
           </div>
-        )}
-        <nav className="mobile-nav">
-          <button className="active">
-            <Sparkles />
-            <span>Home</span>
-          </button>
-          <button
-            onClick={() =>
-              document.getElementById("discover")?.scrollIntoView()
-            }
-          >
-            <Search />
-            <span>Explore</span>
-          </button>
-          <button onClick={() => setCartOpen(true)}>
-            <Heart />
-            <span>Wishlist</span>
-          </button>
-          <button>
-            <ShoppingCart />
-            <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
-          </button>
-        </nav>
-        <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
-      </div>
-    
+          <div className="footer-callout">
+            <p className="kicker">Keep in the loop</p>
+            <h3>
+              Good tech,
+              <br />
+              <em>no noise.</em>
+            </h3>
+            <p>New drops and genuinely useful deals, once in a while.</p>
+            <a href="#email">
+              Join the list <ArrowUpRight size={15} />
+            </a>
+          </div>
+        </div>
+        <div className="container footer-bottom">
+          <span>© 2026 TechMart Nigeria</span>
+          <span>Made for the curious.</span>
+          <span>Privacy & terms</span>
+        </div>
+      </footer>
+      {toast && (
+        <div className="toast">
+          <Check size={16} /> {toast}
+        </div>
+      )}
+      <nav className="mobile-nav">
+        <button className="active">
+          <Sparkles />
+          <span>Home</span>
+        </button>
+        <button
+          onClick={() => document.getElementById("discover")?.scrollIntoView()}
+        >
+          <Search />
+          <span>Explore</span>
+        </button>
+        <button
+          onClick={() => {
+            window.location.href = "/account";
+          }}
+        >
+          <Heart />
+          <span>Wishlist</span>
+        </button>
+        <button onClick={() => setCartOpen(true)}>
+          <ShoppingCart />
+          <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
+        </button>
+      </nav>
+      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+    </div>
   );
 }
 
@@ -699,12 +706,17 @@ function AppRouter() {
   if (location.pathname === "/cart") return <CartPage />;
   if (location.pathname === "/checkout") return <CheckoutPage />;
   if (location.pathname === "/account") return <AccountPage />;
-  if (location.pathname.startsWith("/product/")) return <ProductPage productId={location.pathname.split("/")[2]} />;
+  if (location.pathname.startsWith("/product/"))
+    return <ProductPage productId={location.pathname.split("/")[2]} />;
   return <HomePage />;
 }
 
 function App() {
-  return <BrowserRouter><AppRouter /></BrowserRouter>;
+  return (
+    <BrowserRouter>
+      <AppRouter />
+    </BrowserRouter>
+  );
 }
 
 export default App;
