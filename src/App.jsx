@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { BrowserRouter, Link } from "react-router-dom";
+import { BrowserRouter, Link, useLocation } from "react-router-dom";
 import {
   ArrowRight,
   ArrowUpRight,
@@ -24,6 +24,8 @@ import { products } from "./data/products";
 import { useCart } from "./contexts/CartContext";
 import { useWishlist } from "./contexts/WishlistContext";
 import { formatPrice } from "./utils/helpers";
+import { AccountPage, CartPage, CheckoutPage, ProductPage } from "./pages";
+import HomeHighlights from "./components/home/HomeHighlights";
 import "./App.css";
 
 const categories = [
@@ -288,7 +290,7 @@ function CartDrawer({ isOpen, onClose }) {
   );
 }
 
-function App() {
+function HomePage() {
   const { addItem, cartCount } = useCart();
   const { wishlistCount } = useWishlist();
   const [query, setQuery] = useState("");
@@ -327,8 +329,7 @@ function App() {
   };
 
   return (
-    <BrowserRouter>
-      <div className="app-shell">
+    <div className="app-shell">
         <div className="announcement">
           <Zap size={13} /> Free delivery on orders over ₦500,000{" "}
           <span>
@@ -377,9 +378,9 @@ function App() {
               <div className="delivery">
                 <MapPin size={17} /> Deliver to <b>Nigeria</b>
               </div>
-              <span className="account">
+              <a className="account" href="/account">
                 Hi, <b>Sign in</b>
-              </span>
+              </a>
               <button className="header-icon" aria-label="Wishlist">
                 <Heart size={20} />
                 <i>{wishlistCount}</i>
@@ -492,6 +493,7 @@ function App() {
               ))}
             </div>
           </section>
+          <HomeHighlights />
           <section className="deals" id="deals">
             <div className="container">
               <div className="section-head light">
@@ -688,7 +690,21 @@ function App() {
         </nav>
         <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       </div>
-    </BrowserRouter>
+    
   );
 }
+
+function AppRouter() {
+  const location = useLocation();
+  if (location.pathname === "/cart") return <CartPage />;
+  if (location.pathname === "/checkout") return <CheckoutPage />;
+  if (location.pathname === "/account") return <AccountPage />;
+  if (location.pathname.startsWith("/product/")) return <ProductPage productId={location.pathname.split("/")[2]} />;
+  return <HomePage />;
+}
+
+function App() {
+  return <BrowserRouter><AppRouter /></BrowserRouter>;
+}
+
 export default App;
