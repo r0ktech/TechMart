@@ -2,8 +2,11 @@ import { useMemo, useState } from "react";
 import { BrowserRouter, Link } from "react-router-dom";
 import {
   ArrowRight,
+  ArrowUpRight,
   Check,
   Heart,
+  Instagram,
+  Mail,
   MapPin,
   Menu,
   Search,
@@ -14,6 +17,10 @@ import {
   ShieldCheck,
   X,
   Zap,
+  Minus,
+  Plus,
+  Trash2,
+  Youtube,
 } from "lucide-react";
 import { products } from "./data/products";
 import { useCart } from "./contexts/CartContext";
@@ -142,6 +149,36 @@ function ProductCard({ product, onAdd }) {
   );
 }
 
+function CartDrawer({ isOpen, onClose }) {
+  const { items, removeItem, updateQuantity, subtotal, delivery, total, cartCount } = useCart();
+
+  return (
+    <>
+      <div className={`cart-backdrop ${isOpen ? "visible" : ""}`} onClick={onClose} />
+      <aside className={`cart-drawer ${isOpen ? "open" : ""}`} aria-hidden={!isOpen} aria-label="Shopping cart">
+        <div className="cart-header">
+          <div><p className="kicker">Your selection</p><h2>Your cart <span>({cartCount})</span></h2></div>
+          <button className="drawer-close" onClick={onClose} aria-label="Close cart"><X size={20} /></button>
+        </div>
+        {items.length ? (
+          <>
+            <div className="cart-items">
+              {items.map((item) => (
+                <div className="cart-item" key={`${item.id}-${item.variantKey}`}>
+                  <img src={item.image?.startsWith("http") ? item.image : getProductImage({ category: item.category, images: [item.image] })} alt={item.name} />
+                  <div className="cart-item-copy"><p>{item.brand}</p><h3>{item.name}</h3><strong>{formatPrice(item.price)}</strong><div className="quantity"><button onClick={() => updateQuantity(item.id, item.variantKey, item.quantity - 1)} aria-label={`Decrease ${item.name} quantity`}><Minus size={13} /></button><span>{item.quantity}</span><button onClick={() => updateQuantity(item.id, item.variantKey, item.quantity + 1)} aria-label={`Increase ${item.name} quantity`}><Plus size={13} /></button></div></div>
+                  <button className="remove-item" onClick={() => removeItem(item.id, item.variantKey)} aria-label={`Remove ${item.name}`}><Trash2 size={15} /></button>
+                </div>
+              ))}
+            </div>
+            <div className="cart-summary"><div><span>Subtotal</span><strong>{formatPrice(subtotal)}</strong></div><div><span>Delivery</span><strong>{delivery === 0 ? "Free" : formatPrice(delivery)}</strong></div><div className="cart-total"><span>Total</span><strong>{formatPrice(total)}</strong></div><button className="primary checkout-button">Proceed to checkout <ArrowRight size={16} /></button><p className="cart-note"><ShieldCheck size={14} /> Secure checkout across Nigeria</p></div>
+          </>
+        ) : <div className="cart-empty"><div className="empty-cart-icon"><ShoppingCart size={24} /></div><h3>Your cart is waiting</h3><p>Good tech has a way of finding its way home. Start with something you love.</p><button className="primary" onClick={onClose}>Continue shopping <ArrowRight size={15} /></button></div>}
+      </aside>
+    </>
+  );
+}
+
 function App() {
   const { addItem, cartCount } = useCart();
   const { wishlistCount } = useWishlist();
@@ -149,6 +186,7 @@ function App() {
   const [category, setCategory] = useState("all");
   const [toast, setToast] = useState("");
   const [menu, setMenu] = useState(false);
+  const [cartOpen, setCartOpen] = useState(false);
   const visible = useMemo(
     () =>
       products.filter((product) => {
@@ -236,7 +274,7 @@ function App() {
                 <Heart size={20} />
                 <i>{wishlistCount}</i>
               </button>
-              <button className="header-icon" aria-label="Cart">
+              <button className="header-icon" onClick={() => setCartOpen(true)} aria-label="Open cart">
                 <ShoppingCart size={20} />
                 <i>{cartCount}</i>
               </button>
@@ -447,17 +485,8 @@ function App() {
             </form>
           </section>
         </main>
-        <footer>
-          <div className="container footer">
-            <Link className="logo" to="/">
-              <span>
-                <Sparkles size={16} />
-              </span>
-              tech<b>mart</b>
-            </Link>
-            <p>Tech that moves you forward.</p>
-            <small>© 2026 TechMart Nigeria</small>
-          </div>
+        <footer className="site-footer">
+          <div className="container footer-top"><div className="footer-brand"><Link className="logo" to="/"><span><Sparkles size={16} /></span>tech<b>mart</b></Link><p>Thoughtful technology for the<br />way Nigeria moves.</p><div className="socials"><a href="#instagram" aria-label="Instagram"><Instagram size={16} /></a><a href="#youtube" aria-label="YouTube"><Youtube size={16} /></a><a href="#mail" aria-label="Email"><Mail size={16} /></a></div></div><div className="footer-column"><h3>Shop</h3><a href="#discover">Laptops</a><a href="#discover">Phones</a><a href="#discover">Tablets</a><a href="#deals">Deals</a></div><div className="footer-column"><h3>Need help?</h3><a href="#support">Delivery & returns</a><a href="#support">Track an order</a><a href="#support">Contact support</a><a href="#support">Sell on TechMart</a></div><div className="footer-callout"><p className="kicker">Keep in the loop</p><h3>Good tech,<br /><em>no noise.</em></h3><p>New drops and genuinely useful deals, once in a while.</p><a href="#email">Join the list <ArrowUpRight size={15} /></a></div></div><div className="container footer-bottom"><span>© 2026 TechMart Nigeria</span><span>Made for the curious.</span><span>Privacy & terms</span></div>
         </footer>
         {toast && (
           <div className="toast">
@@ -477,7 +506,7 @@ function App() {
             <Search />
             <span>Explore</span>
           </button>
-          <button>
+          <button onClick={() => setCartOpen(true)}>
             <Heart />
             <span>Wishlist</span>
           </button>
@@ -486,6 +515,7 @@ function App() {
             <span>Cart {cartCount > 0 && `(${cartCount})`}</span>
           </button>
         </nav>
+        <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
       </div>
     </BrowserRouter>
   );

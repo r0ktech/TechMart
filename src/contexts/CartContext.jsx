@@ -65,6 +65,7 @@ export function CartProvider({ children }) {
         brand: product.brand,
         price: product.price,
         originalPrice: product.originalPrice,
+        category: product.category,
         image: product.images?.[0],
         variantKey,
         variants: selectedVariants,
