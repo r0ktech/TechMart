@@ -345,8 +345,9 @@ function App() {
               {menu ? <X /> : <Menu />}
             </button>
             <Link className="logo" to="/">
-              <span>
-                <Sparkles size={16} />
+              <span className="logo-mark" aria-hidden="true">
+                <i>T</i>
+                <i>M</i>
               </span>
               tech<b>mart</b>
             </Link>
@@ -602,8 +603,9 @@ function App() {
           <div className="container footer-top">
             <div className="footer-brand">
               <Link className="logo" to="/">
-                <span>
-                  <Sparkles size={16} />
+                <span className="logo-mark" aria-hidden="true">
+                  <i>T</i>
+                  <i>M</i>
                 </span>
                 tech<b>mart</b>
               </Link>
